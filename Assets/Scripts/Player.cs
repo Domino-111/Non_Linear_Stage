@@ -1,196 +1,88 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-//The RequireComponent attribute checks a GameObject for the defined components, and adds them if they are missing.
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(CapsuleCollider))]
-
-public class CustomController : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    // This enumerator will define all our possible player states
-    public enum State
-    {
-        Walk,
-        Rise,
-        Fall,
-    }
-
-    [Tooltip("To track the current behaviour of the player")]
-    [SerializeField] private State currentState;
-
-    [Tooltip("How many units per sec the player should move by default")]
-    [SerializeField] private float speedWalk;
-
-    [Tooltip("How much upward momentum to start with when jumping")]
-    [SerializeField] private float jumpPower;
-
-    [Tooltip("Reduce the player's vertical momentum by this many units per second")]
+    [SerializeField] private float walkSpeed;
+    [SerializeField] private float currentWalkSpeed;
     [SerializeField] private float gravity;
+    [SerializeField] private float jumpPower;
+    [SerializeField] private float speedThisFrame;
+    public LayerMask groundedMask;
+    [SerializeField] Vector3 movementThisFrame;
+    [SerializeField] Vector2 inputThisFrame;
 
-    [Tooltip("What physics layer should the player object recognise as the ground")]
-    [SerializeField] private LayerMask groundLayer;
+    public float raycastDistance;
 
-    [Tooltip("The maximum number of jumps before the player touches the ground again")]
-    [SerializeField] private int jumpsAllowed = 1;
+    public Rigidbody rb;
 
-    // The number of jumps the player currently has available
-    private int jumpsRemaining;
+    public Transform cameraTransform;
 
-    // To hold the rigidbody on the player object
-    private Rigidbody rb;
-
-    // Get a reference to the cameraController to move with it's direction
-    public CameraController cameraController;
-
-    // To hold the player's collider
-    private CapsuleCollider capsuleCollider;
-
-    void Start()
+    private void Awake()
     {
-        // Get the rigidbody component from the player object
         rb = GetComponent<Rigidbody>();
-
-        // Prevent the rigidbody from rotating
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
-
-        // This script manages gravity its own way
-        rb.useGravity = false;
-
-        // Get the capsule collider component from the player object
-        capsuleCollider = GetComponent<CapsuleCollider>();
-
-        // Refresh the number of jumps the player has available
-        jumpsRemaining = jumpsAllowed;
+        currentWalkSpeed = walkSpeed;
     }
 
-    void Update()
+    private void Update()
     {
-        // Depending on our current state, choose a different set of behaviour to follow
-        switch (currentState)
+        //get our inputs this frame
+        inputThisFrame.x = Input.GetAxis("Horizontal");
+        inputThisFrame.y = Input.GetAxis("Vertical");
+
+        //reset our potential movement to 0, 0, 0
+        movementThisFrame = Vector3.zero;
+
+        //apply our new input direction right/left and forward/back
+        movementThisFrame.x = inputThisFrame.x;
+        movementThisFrame.z = inputThisFrame.y;
+
+        //figure out what our speed should be this frame
+        speedThisFrame = walkSpeed;
+
+        movementThisFrame *= speedThisFrame;
+
+        movementThisFrame.y = rb.linearVelocity.y - gravity * Time.deltaTime;
+
+        if (IsGrounded() == true)
         {
-            case State.Walk:
-                WalkState();
-                break;
-            case State.Rise:
-                RiseState();
-                break;
-            case State.Fall:
-                FallState();
-                break;
-        }
-    }
+            print(IsGrounded());
 
-    private void WalkState()
-    {
-        // Make sure we have all our jumps available
-        jumpsRemaining = jumpsAllowed;
-
-        // Get a movement direction based on inputs and translated using the camera direction
-        Vector3 inputMovement = GetMovementFromInput();
-
-        // Increase that using our base walk speed 
-        inputMovement *= speedWalk;
-
-        // Adjust up/down speed based on gravity but since we're walking we shouldn't fall
-        inputMovement.y = Mathf.Clamp(rb.linearVelocity.y - gravity * Time.deltaTime, 0f, float.PositiveInfinity);
-
-        // If we are no longer on the ground...
-        if (!IsGrounded())
-        {
-            // ...we should be falling
-            currentState = State.Fall;
-
-            // Reduce our jumps by 1
-            jumpsRemaining -= 1;
-
-            return;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                movementThisFrame.y = jumpPower;
+            }
         }
 
-        // If we make it here, we must be on the ground.
-        TryToJump();
-    }
+        Movement(movementThisFrame);
 
-    private void RiseState()
-    {
-        // Set movement based on input direction, camera direction, and walking speed
-        Vector3 inputMovement = GetMovementFromInput();
-        inputMovement *= speedWalk;
-
-        // Apply gravity
-        inputMovement.y = rb.linearVelocity.y - gravity * Time.deltaTime;
-
-        // Apply the determined movement to our rigidbody
-        rb.linearVelocity = inputMovement;
-
-        // If velocity.y is less than 0, we are moving down, so we should enter Fall state
-        if (rb.linearVelocity.y < 0f)
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            currentState = State.Fall;
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, transform.forward, out hit, 2f))
+            {
+                //if (hit.transform.TryGetComponent<Interactable_MasterClass>(out Interactable_MasterClass interact))
+                //{
+                //    interact.Click();
+                //}
+            }
         }
-
-        TryToJump();
-    }
-
-    private void FallState()
-    {
-        // Set movement based on input, camera, walk speed, and apply gravity
-        Vector3 inputMovement = GetMovementFromInput();
-        inputMovement *= speedWalk;
-        inputMovement.y = rb.linearVelocity.y - gravity * Time.deltaTime;
-
-        // Apply movement to the rigidbody
-        rb.linearVelocity = inputMovement;
-
-        // If we are on the ground..
-        if (IsGrounded())
-        {
-            // ...Change to the Walk state
-            currentState = State.Walk;
-        }
-
-        TryToJump();
-    }
-
-    private void TryToJump()
-    {
-        // If the player presses jump...
-        if (Input.GetButtonDown("Jump") && jumpsRemaining > 0)
-        {
-            // ... add upwards momentum to the player and change to the Rise state 
-            RiseAtSpeed(jumpPower);
-
-            //Reduce our remaining jumps
-            jumpsRemaining -= 1;
-        }
-    }
-
-    private void RiseAtSpeed(float speed)
-    {
-        // Set our vertical momentum upward using the provided speed 
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, speed, rb.linearVelocity.z);
-
-        // Change to the Rise state
-        currentState = State.Rise;
-    }
-
-    // Get current inputs and translate to a movement direction
-    private Vector3 GetMovementFromInput()
-    {
-        Vector2 inputThisFrame = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-
-        Vector3 moveDirection = new Vector3(inputThisFrame.x, 0, inputThisFrame.y);
-
-        // Get the transform of the currently active camera
-        Transform cameraTransform = cameraController.GetCameraTransform();
-
-        // Translate the movement direction based on the camera's transform
-        moveDirection = cameraTransform.TransformDirection(moveDirection);
-
-        return moveDirection;
     }
 
     private bool IsGrounded()
     {
-        //Raycast downwards from our centre, using half of our collider's height
-        return Physics.Raycast(transform.position, Vector3.down, capsuleCollider.height / 2f + 0.01f, groundLayer);
+        RaycastHit hit;
+        return Physics.SphereCast(transform.position, 1, Vector3.down, out hit, raycastDistance, groundedMask);
+    }
+
+    private void Movement(Vector3 movement)
+    {
+        transform.localEulerAngles = new Vector3(0, cameraTransform.localEulerAngles.y, 0);
+
+        movement = transform.TransformDirection(movement);
+
+        rb.linearVelocity = movement;
     }
 }

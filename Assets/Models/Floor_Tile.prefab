@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6202087582739124289}
   - component: {fileID: 7241944087092853389}
   - component: {fileID: 6724824694291310429}
+  - component: {fileID: 8985139043119249362}
   m_Layer: 0
   m_Name: Floor_Tile
   m_TagString: Untagged
@@ -105,11 +106,32 @@ MeshCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
+--- !u!65 &8985139043119249362
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8889568867844967076}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.15, z: 1}
+  m_Center: {x: 0, y: 0.025, z: 0}
 --- !u!1001 &7280369150289692192
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -212,7 +234,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 100, y: 15, z: 100}
   m_Center: {x: 0, y: 0.00000047683716, z: 0}
