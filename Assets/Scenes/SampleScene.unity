@@ -36348,17 +36348,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34b4cc29d04d6414c8f6c73131520a7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  walkSpeed: 5
+  walkSpeed: 2
   currentWalkSpeed: 0
   gravity: 1
-  jumpPower: 5
+  jumpPower: 110
   speedThisFrame: 0
   groundedMask:
     serializedVersion: 2
     m_Bits: 64
   movementThisFrame: {x: 0, y: 0, z: 0}
   inputThisFrame: {x: 0, y: 0}
-  raycastDistance: 0.15
+  jumpTimer: 0
+  timerLength: 1
   rb: {fileID: 2093404634}
   cameraTransform: {fileID: 330585546}
 --- !u!1001 &2093977238

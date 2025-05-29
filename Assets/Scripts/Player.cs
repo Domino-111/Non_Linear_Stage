@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Vector3 movementThisFrame;
     [SerializeField] Vector2 inputThisFrame;
 
-    public float raycastDistance;
+    public float jumpTimer, timerLength;
 
     public Rigidbody rb;
 
@@ -46,16 +47,6 @@ public class PlayerMovement : MonoBehaviour
 
         movementThisFrame.y = rb.linearVelocity.y - gravity * Time.deltaTime;
 
-        if (IsGrounded() == true)
-        {
-            print(IsGrounded());
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                movementThisFrame.y = jumpPower;
-            }
-        }
-
         Movement(movementThisFrame);
 
         if (Input.GetKeyDown(KeyCode.E))
@@ -69,12 +60,9 @@ public class PlayerMovement : MonoBehaviour
                 //}
             }
         }
-    }
 
-    private bool IsGrounded()
-    {
-        RaycastHit hit;
-        return Physics.SphereCast(transform.position, 1, Vector3.down, out hit, raycastDistance, groundedMask);
+        jumpTimer -= Time.deltaTime;
+        Jump();
     }
 
     private void Movement(Vector3 movement)
@@ -84,5 +72,16 @@ public class PlayerMovement : MonoBehaviour
         movement = transform.TransformDirection(movement);
 
         rb.linearVelocity = movement;
+    }
+
+    private void Jump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && jumpTimer <= 0)
+        {
+            //movementThisFrame.y = jumpPower;
+            rb.AddForce(Vector3.up * jumpPower);
+
+            jumpTimer = timerLength;
+        }
     }
 }
