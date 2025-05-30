@@ -3,9 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class DeathFloor : MonoBehaviour
 {
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collider)
     {
-        if (collision.rigidbody.gameObject.CompareTag("Player"))
+        if (collider.gameObject.CompareTag("Player"))
         {
             SceneManager.LoadScene("SampleScene");
         }

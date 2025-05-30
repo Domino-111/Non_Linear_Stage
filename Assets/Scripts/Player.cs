@@ -54,10 +54,10 @@ public class PlayerMovement : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(transform.position, transform.forward, out hit, 2f))
             {
-                //if (hit.transform.TryGetComponent<Interactable_MasterClass>(out Interactable_MasterClass interact))
-                //{
-                //    interact.Click();
-                //}
+                if (hit.transform.TryGetComponent<Interactable>(out Interactable interact))
+                {
+                    interact.Click();
+                }
             }
         }
 
