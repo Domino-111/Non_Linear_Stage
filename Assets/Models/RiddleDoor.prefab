@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7640614756694907509}
   - component: {fileID: 2210397296962499233}
   m_Layer: 0
-  m_Name: StraightWall
+  m_Name: RiddleDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0.7071058, w: 0.7071078}
   m_LocalPosition: {x: -0.0341, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4318072877276369317}
@@ -113,7 +113,7 @@ PrefabInstance:
     - target: {fileID: -6067185528594298527, guid: 67ffe74ab63584644963128fd23ec2ae, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: -876546973899608171, guid: 6c3eb23f4b5e2774a9a90b9b16d7ddd1, type: 3}
+      objectReference: {fileID: 2100000, guid: 209042dc7f48e25408ed68cb1d2157cd, type: 2}
     - target: {fileID: -4795165560744122111, guid: 67ffe74ab63584644963128fd23ec2ae, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
